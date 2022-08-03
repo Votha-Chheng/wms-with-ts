@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "gestion_stock_v2",
+    "slug": "gestion_stock_v2",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
