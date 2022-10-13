@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React, { FC, useState } from 'react'
 import { Button, TextInput } from 'react-native-paper'
 import globalStyles from '../../globalStyles'

@@ -1,3 +1,5 @@
+import Realm from "realm"
+
 export class Category {
   _id: number;
   nom: string;
@@ -14,7 +16,7 @@ export class Category {
 }
 
 
-const CategorySchema = {
+const CategorySchema : Realm.ObjectSchema = {
   name: "Category",
   primaryKey: "_id",
   properties: {
@@ -22,5 +24,6 @@ const CategorySchema = {
     nom: "string",
   },
 }
+
 
 export default CategorySchema

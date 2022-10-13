@@ -4,11 +4,12 @@ export interface FilterState {
   filters : {
     parType: string
     alphabetique: boolean
-    ordreAlphabet: boolean
+    ordreAlphabet?: boolean
     dateEntree : boolean
-    recent: boolean
+    recent?: boolean
     searchInput: string
     alertStock: boolean
+    searchByText:string
   }
 }
 
@@ -16,11 +17,12 @@ const initialState: FilterState = {
   filters : {
     parType : "",
     alphabetique : false,
-    ordreAlphabet: false,
+    ordreAlphabet: null,
     dateEntree : true,
     recent: true,
     searchInput : "",
-    alertStock: false
+    alertStock: false,
+    searchByText:""
   }
 }
 
@@ -31,12 +33,13 @@ const filterSlice = createSlice({
     resetFilters: (state) => {
       state.filters = {
         parType : "",
-        recent: true,
         alphabetique : false,
-        ordreAlphabet: false,
+        ordreAlphabet: null,
         dateEntree : true,
-        searchInput: "",
-        alertStock: false
+        recent: true,
+        searchInput : "",
+        alertStock: false,
+        searchByText:""
       }
     },
     changeFilters : (state, action) =>{

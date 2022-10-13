@@ -5,7 +5,7 @@ export class Product {
   codeBarType?: string;
   marque: string;
   nom: string;
-  categorie?: Category;
+  categorie: Category;
   telFournisseur?: string;
   siteFournisseur?: string;
   commandeEncours: boolean = false;
@@ -19,7 +19,7 @@ export class Product {
     nom: string,
     qty: number,
     stockLimite: number,
-    categorie?: {_id: number, nom: string},
+    categorie: {_id: any, nom: string},
     telFournisseur?: string,
     siteFournisseur?: string,
     commandeEncours: boolean = false
@@ -38,7 +38,7 @@ export class Product {
   }
 }
 
-const ProductSchema = {
+const ProductSchema: Realm.ObjectSchema = {
   name: "Product",
   primaryKey: "_id",
   properties: {
@@ -48,10 +48,10 @@ const ProductSchema = {
     nom: "string",
     qty:"int",
     stockLimite:"int",
-    categorie: "Category?",
+    categorie: "Category",
     telFournisseur:"string?",
     siteFournisseur : "string?",
-    commandeEncours:{type:"bool", default: false},
+    commandeEncours:{type:"bool", default: false}
   },
 }
 

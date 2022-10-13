@@ -1,55 +1,34 @@
 import { StyleSheet } from 'react-native'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC } from 'react'
 import { Product } from '../models/Product'
 import { Modal, Portal, Provider } from 'react-native-paper'
 import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store/store'
 import DisplayProductInfos from './DisplayProductInfos'
-import ModifyProductInfos from './ModifyProductInfos'
-import { Category } from '../models/Category'
 import { hideModal } from '../store/slices/modal'
+import { getSingleProduct } from '../store/slices/productsAndCategories'
+import { renderColorText } from '../../utils'
+import ModifyOrEnterNewProduct from './ModifyOrEnterNewProduct'
 
 type ModalListRendererProps = {
-  displayProduct: Product
-  allCategories: Category[]
   realm: Realm
-  setDisplayProduct: Function
   modify: boolean
   setModify: Function
+  localSingleProduct: Product
 }
 
-const ModalListRenderer: FC<ModalListRendererProps> = ({displayProduct, allCategories, realm, setDisplayProduct, modify, setModify}: ModalListRendererProps) => {
+const ModalListRenderer: FC<ModalListRendererProps> = ({realm, modify, setModify, localSingleProduct}: ModalListRendererProps) => {
 
-  const [modifyNom, setModifyNom] = useState<string>(null)
-  const [modifyCategory, setModifyCategory] = useState<Category>(null)
-  const [modifyMarque, setModifyMarque] = useState<string>(null)
-  const [modifyQty, setModifyQty] = useState<number>(null)
-  const [modifyStockLimite, setModifyStockLimite] = useState<number>(null)
-  const [modifyTelFournisseur, setModifyTelFournisseur] = useState<string>(null)
-  const [modifySiteWeb, setModifySiteWeb] = useState<string>(null)
-  const [modifyCommandeEnCours, setModifyCommandeEnCours] = useState<boolean>(null)
+  const {singleProduct} = useSelector((state: RootState)=> state.productAndCategories)
 
   const {visible} = useSelector((state: RootState) => state.modalVisible)
 
   const dispatch = useDispatch()
 
-  useEffect(()=>{
-    if(displayProduct !==null){
-      setModifyNom(displayProduct.nom)
-      setModifyCategory(displayProduct.categorie)
-      setModifyMarque(displayProduct.marque)
-      setModifyQty(displayProduct.qty)
-      setModifyStockLimite(displayProduct.stockLimite)
-      setModifyTelFournisseur(displayProduct.telFournisseur)
-      setModifySiteWeb(displayProduct.siteFournisseur)
-      setModifyCommandeEnCours(displayProduct.commandeEncours)
-    }
-    
-  }, [displayProduct])
-
   const onDismissModal = ()=>{
     dispatch(hideModal())
     setModify(false)
+    dispatch(getSingleProduct(null))
     
   }
 
@@ -60,37 +39,34 @@ const ModalListRenderer: FC<ModalListRendererProps> = ({displayProduct, allCateg
           visible={visible} 
           dismissable={false}
           onDismiss={onDismissModal} 
-          contentContainerStyle={[styles.modalStyle, {justifyContent:"flex-start"}]}
+          contentContainerStyle={[
+            styles.modalStyle, 
+            {
+              justifyContent:"flex-start", 
+              backgroundColor:`${
+                modify ? "white" 
+                : renderColorText(localSingleProduct || singleProduct, false, "red", "white", "orange")
+              }`
+            }
+          ]}
         >
           {
-            displayProduct === null 
+            localSingleProduct !== null && modify === true
             ?
-            null
-            :
-            modify 
-            ?
-            <ModifyProductInfos 
+            <ModifyOrEnterNewProduct 
               realm={realm}
-              displayProduct={displayProduct}
-              modifyNom={modifyNom} 
-              modifyCategory={modifyCategory}
-              modifyMarque={modifyMarque}
-              modifyQty={modifyQty}
-              modifyStockLimite={modifyStockLimite}
-              modifyTelFournisseur={modifyTelFournisseur}
-              modifySiteWeb={modifySiteWeb}
-              setModifyNom={setModifyNom}
-              setModifyCategory={setModifyCategory}
-              setModifyMarque={setModifyMarque}
-              setModifyQty={setModifyQty}
-              setModifyStockLimite={setModifyStockLimite}
-              setModifyTelFournisseur={setModifyTelFournisseur}
-              setModifySiteWeb={setModifySiteWeb}
-              setModify={setModify}
-              allCategories={allCategories}
+              newProduct={false}
             />
             :
-            <DisplayProductInfos displayProduct={displayProduct} setModify={setModify}/>
+            localSingleProduct !== null && modify === false 
+            ? 
+            <DisplayProductInfos 
+              realm={realm} 
+              setModify={setModify}
+              localSingleProduct = {localSingleProduct}
+            />
+            :
+            null
           }
         </Modal>
       </Portal>

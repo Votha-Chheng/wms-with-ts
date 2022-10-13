@@ -6,6 +6,10 @@ import scanningReducer from "./slices/scanning"
 import codeBarDataTypeReducer from "./slices/dataBarCode"
 import errorMessageReducer from './slices/errorMessage'
 import filtersReducer from './slices/filters'
+import selectedMarqueOrCategoryReducer from './slices/selectedMarqueOrCategory'
+import categoryTopMenuReducer from './slices/categoryMenus'
+import productsAndCategoriesReducer from './slices/productsAndCategories'
+
 
 const store = configureStore({
   reducer: {
@@ -14,8 +18,13 @@ const store = configureStore({
     scanning : scanningReducer,
     codeBarDataType : codeBarDataTypeReducer,
     errorMessage : errorMessageReducer,
-    filters : filtersReducer
-  }
+    filters : filtersReducer,
+    selectedMarqueOrCategory : selectedMarqueOrCategoryReducer,
+    categoryTopMenu : categoryTopMenuReducer,
+    productAndCategories : productsAndCategoriesReducer
+
+  },
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({serializableCheck: false}),
 })
 
 export type RootState = ReturnType<typeof store.getState>

@@ -1,4 +1,4 @@
-import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
+import { FlatList, StyleSheet } from 'react-native'
 import React, { FC, useEffect } from 'react'
 import { Product } from '../models/Product'
 import { Category } from '../models/Category'

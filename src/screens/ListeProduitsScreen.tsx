@@ -1,7 +1,6 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native'
 import React, { FC, useEffect, useState } from 'react'
 import { Product } from '../models/Product'
-import { Category } from '../models/Category'
 import InventaireListRender from '../components/InventaireListRender'
 import FilterProducts from '../components/FilterProducts'
 import { useDispatch, useSelector } from 'react-redux'
@@ -12,24 +11,24 @@ import { unscan } from '../store/slices/scanning'
 import { getCameraPermission } from '../store/slices/cameraPermission'
 import { resetCodeBarData } from '../store/slices/dataBarCode'
 import { AppDispatch, RootState } from '../store/store'
-
+import { getSingleCategory, getSingleProduct } from '../store/slices/productsAndCategories'
+import { displayProductByFilters } from '../../utils'
 
 type ListeProduitsScreenProps = {
   realm: Realm
-  allProducts: Product[]
-  allCategories: Category[]
 }
 
-const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm, allProducts, allCategories}: ListeProduitsScreenProps) => {
-
-  const [displayProduct, setDisplayProduct] = useState<Product>(null)
-  const [productToDisplay, setProductToDisplay] = useState<Product[]>([])
+const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm}: ListeProduitsScreenProps) => {
   const [modify, setModify] = useState<boolean>(false)
+  const [localSingleProduct, setLocalSingleProduct] = useState<Product|null>(null)
 
   const { cameraStatus } = useSelector((state: RootState)=> state.cameraPermission)
 
   const { filters } = useSelector((state: RootState) => state.filters)
-  const { parType, alphabetique, ordreAlphabet, dateEntree, recent, alertStock } = filters
+
+  const {selectedMarqueOrCategory} = useSelector((state: RootState)=> state.selectedMarqueOrCategory)
+
+  const {allProducts, allCategories, singleProduct} = useSelector((state: RootState)=> state.productAndCategories)
 
   const dispatch = useDispatch<AppDispatch>()
 
@@ -37,7 +36,6 @@ const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm, allProducts, 
     dispatch(getCameraPermission())
     dispatch(unscan())
     dispatch(hideModal())
-    setDisplayProduct(null)
     setModify(false)
 
     return()=>{
@@ -49,75 +47,52 @@ const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm, allProducts, 
   }, [cameraStatus])
 
   useEffect(()=>{
-    displayProductByFilters(allProducts)
+    if(singleProduct !== null){
+      const product = allProducts.filter(prod=> prod._id === singleProduct._id)
 
-  }, [filters])
-
-  const displayProductByFilters = (productList: Product[])=>{
-    let temp : Product[]
-
-    if(parType !== ""){
-      temp = productList.filter( p => p.categorie.nom === parType)
+      setLocalSingleProduct(product[0])
     }
-
-    if(alertStock === true){
-      temp = productList.filter(p => p.qty <= p.stockLimite)
-    }
-
-    if(dateEntree === true && recent === false){
-      temp = temp
-    }
-
-    if(dateEntree === true && recent === true){
-      temp = temp.reverse()
-    }
-
-    if(alphabetique === true && ordreAlphabet === true){
-      temp = temp.sort()
-    }
-
-    if(alphabetique === true && ordreAlphabet === false){
-      temp = temp.sort((a, b) => b[parType.toString()].localeCompare(a[parType.toString()]))
-    }
-
-    setProductToDisplay(temp)
-  }
+  }, [allProducts])
 
   const onPressItem = (id: string)=>{
-    setDisplayProduct(fetchProductById(realm, id))
-    setModify(false)
-    dispatch(showModal())  
-
+    const prod = fetchProductById(realm, id)
+    
+    if(prod !== null){
+      dispatch(getSingleProduct(prod))
+      dispatch(getSingleCategory(prod.categorie))
+      setModify(false)
+      dispatch(showModal())  
+      
+    }
   }
 
   return (
     <View style={styles.screenContainer}>
-      <FilterProducts/>
       <View>
-        {
-          productToDisplay.length >0
-          ?
-          <FlatList
-            data={productToDisplay}
-            keyExtractor={(item: Product) => item._id.toString()}
-            renderItem = {({item}) => (
-              <InventaireListRender
-                data={item}
-                onPressFunction={onPressItem}
-              />
+        <FlatList
+          ListHeaderComponent={
+            <FilterProducts allProducts={allProducts} allCategories={allCategories}/>
+          }
+          data={displayProductByFilters(allProducts, filters, selectedMarqueOrCategory)}
+          keyExtractor={(item: Product) => item._id.toString()}
+          renderItem = {({item}) => (
+            <InventaireListRender
+            data={item}
+            onPressFunction={()=>onPressItem(item._id.toString())}
+            />
             )}
-          />
-          :
-          <Text style={{flex:1, justifyContent:"center", alignItems:"center", fontSize:20}}>Aucun produit enregistré.</Text>
-        }
+          ListEmptyComponent={<Text>Aucun produit trouvé</Text>}
+        />
       </View>
-
       {
-        displayProduct !== null &&
-        <ModalListRenderer modify={modify} setModify={setModify} displayProduct={displayProduct} allCategories={allCategories} setDisplayProduct={setDisplayProduct} realm={realm}/>
-
+        singleProduct !== null &&
+        <ModalListRenderer 
+          modify={modify} 
+          setModify={setModify} 
+          realm={realm}
+          localSingleProduct={localSingleProduct}
+        />
       }
-      
     </View>
   )
 }
@@ -126,6 +101,6 @@ export default ListeProduitsScreen
 
 const styles = StyleSheet.create({
   screenContainer: {
-    height: "100%"
+    marginHorizontal:5
   },
 })

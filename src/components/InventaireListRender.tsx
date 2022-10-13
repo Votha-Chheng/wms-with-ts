@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { FC } from 'react'
 import { Product } from '../models/Product'
 import globalStyles from '../../globalStyles'
+import { renderColorText } from '../../utils'
 
 type InventaireListRenderProps = {
   data : Product
@@ -10,20 +11,16 @@ type InventaireListRenderProps = {
 
 const InventaireListRender: FC<InventaireListRenderProps> = ({data, onPressFunction}: InventaireListRenderProps) => {
 
-  const renderColorText = (product: Product) : string =>{
-    return product.qty <= product.stockLimite ? "#e7efeb" : "#697771"
-    
-  }
   return (
-    <TouchableOpacity style={[styles.itemContainer, {backgroundColor: `${data.qty <= data.stockLimite ? "red": "#e7efeb"}`}]} onPress={()=> onPressFunction(data._id)}>
+    <TouchableOpacity style={[styles.itemContainer, {backgroundColor: `${renderColorText(data, false, "red", "#e7efeb")}`}]} onPress={()=> onPressFunction(data._id)}>
       <View style={styles.info}>
-        <Text style={[globalStyles.marque, {color: renderColorText(data)}]}>{data.marque}</Text>
-        <Text style={[globalStyles.nom, {color: renderColorText(data)}]}>{data.nom}</Text>
-        <Text style={[globalStyles.categorie, {color: renderColorText(data)}]}>{data.categorie.nom}</Text>
+        <Text style={[globalStyles.marque, {color: renderColorText(data, true, "#e7efeb", "#697771")}]}>{data.marque}</Text>
+        <Text style={[globalStyles.nom, {color: renderColorText(data, true, "#e7efeb", "#697771")}]}>{data.nom}</Text>
+        <Text style={[globalStyles.categorie, {color: renderColorText(data, true, "#e7efeb", "#697771")}]}>{data.categorie.nom}</Text>
       </View>
       <View style={globalStyles.infoQty}>
-        <Text style={{color: renderColorText(data)}}>Stock actuel</Text>
-        <Text style={[globalStyles.qty, {color: renderColorText(data)}]}>{data.qty}</Text>
+        <Text style={{color: renderColorText(data, true, "#e7efeb", "#697771")}}>Stock actuel</Text>
+        <Text style={[globalStyles.qty, {color: renderColorText(data, true, "#e7efeb", "#697771")}]}>{data.qty}</Text>
       </View>
     </TouchableOpacity>
   )

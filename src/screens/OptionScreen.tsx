@@ -1,45 +1,43 @@
-import { FC, useEffect, useState } from "react"
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import { useDispatch, useSelector } from "react-redux"
-import TopMenuOptions from "../components/TopMenuOptions"
-import { Category } from "../models/Category"
-import { Product } from "../models/Product"
-import { getCameraPermission } from "../store/slices/cameraPermission"
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { FC, useEffect } from "react"
+import { useDispatch } from "react-redux"
 import { resetCodeBarData } from "../store/slices/dataBarCode"
-import { hideModal, showModal } from "../store/slices/modal"
+import { hideModal } from "../store/slices/modal"
 import { unscan } from "../store/slices/scanning"
-import { AppDispatch } from "../store/store"
+import DeleteCategoryScreen from "./DeleteCategoryScreen"
+import DeleteProductScreen from "./DeleteProductScreen"
+import HomeScreen from "./HomeOptionScreen"
 
+const Stack = createNativeStackNavigator()
 
 type OptionScreenProps = {
   realm: Realm
-  allProducts: Product[]
-  allCategories: Category[]
 }
 
+export type OptionStackParams = {
+  DeleteProduct : undefined
+  "Gestion des catégories": undefined
+  "Supprimer des produits": undefined
+};
 
-const OptionScreen: FC<OptionScreenProps> = ({realm, allProducts, allCategories}: OptionScreenProps) => {
-  
-  const [chosenOption, setChosenOption] = useState<string>("")
+const OptionScreen: FC<OptionScreenProps> = ({realm}: OptionScreenProps) => {
 
-  const dispatch = useDispatch<AppDispatch>()
+
+  const dispatch = useDispatch()
+
+  // useEffect(()=>{
+  //   if(chosenOption === ""){
+  //     dispatch(hideModal())
+  //   }
+
+  // }, [chosenOption])
 
   useEffect(()=>{
-    if(chosenOption === ""){
-      dispatch(hideModal())
-    }
-
-  }, [chosenOption])
-
-  useEffect(()=>{
-    dispatch(getCameraPermission())
     dispatch(unscan())
     dispatch(hideModal())
-    setChosenOption("")
 
     return()=>{
       dispatch(resetCodeBarData())
-      
       dispatch(unscan())
 
     }
@@ -51,57 +49,15 @@ const OptionScreen: FC<OptionScreenProps> = ({realm, allProducts, allCategories}
     }
   }, [])
 
-  const deleteAllObjects = ()=>{
-    realm.write(()=>{
-      realm.deleteAll()
-    })
-  }
 
-  const chooseOption = (text: string)=>{
-    setChosenOption(text)
-    dispatch(showModal())
-  }
 
   return (
-    <View style={styles.container}>
-      <TopMenuOptions/>
-      {/* <View style={{height:"100%", justifyContent:"center"}}>
-        <Button style={{marginVertical:15}} onPress={()=>chooseOption("categories")}>
-          Gestion des catégories
-        </Button>
-        <Button style={{marginVertical:15}}  onPress={()=>deleteAllObjects()}>
-          Supprimer tous les produits
-        </Button>
-      </View> */}
-      {/* <Provider>
-        <Portal>
-          <Modal visible={visible && chosenOption !==""} onDismiss={()=>setChosenOption("")} contentContainerStyle={styles.modalStyle}>
-            {
-              chosenOption === "categories" 
-                ? <CategoriesScreen realm={realm} setChosenOption={setChosenOption} allProducts={allProducts} allCategories={allCategories} />
-                : null
-            }
-          </Modal>
-        </Portal>
-      </Provider> */}
-    </View>
+    <Stack.Navigator>
+      <Stack.Screen name="HomeOptions" component={HomeScreen} options={{headerShown: false}} />
+      <Stack.Screen name="Supprimer des produits" children={()=><DeleteProductScreen realm={realm} /> } />
+      <Stack.Screen name="Gestion des catégories" children={()=><DeleteCategoryScreen realm={realm} />} />
+    </Stack.Navigator>
   )
 }
-
-const styles = StyleSheet.create({
-  modalStyle : {
-    backgroundColor: 'white', 
-    paddingVertical: 10,
-    fontWeight: '900',
-    height:"100%",
-  },
-  container: {
-    height:"100%",
-    flex:1,
-    backgroundColor: 'white',
-    //alignItems: 'flex-start',
-    justifyContent: 'space-between',
-  },
-})
 
 export default OptionScreen

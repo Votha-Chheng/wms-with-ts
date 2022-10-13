@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import React, { FC, useEffect } from 'react'
 import { Button } from 'react-native-paper'
 import { useDispatch, useSelector } from 'react-redux'

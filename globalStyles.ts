@@ -1,7 +1,9 @@
 import { StyleSheet } from "react-native";
-import { black } from "react-native-paper/lib/typescript/styles/colors";
 
 const globalStyles = StyleSheet.create({
+  container: {
+    margin:7.5
+  },
   loader : {
     flex: 1,
     justifyContent : "center",

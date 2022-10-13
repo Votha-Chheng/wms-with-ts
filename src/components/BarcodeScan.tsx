@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { FC } from 'react'
-import { BarCodeScannedCallback, BarCodeScanner, BarCodeScannerResult } from 'expo-barcode-scanner'
+import { BarCodeScannedCallback, BarCodeScanner } from 'expo-barcode-scanner'
 
 type BarcodeScanProps = {
   scanned : boolean,

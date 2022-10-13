@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { BarCodeScanner } from "expo-barcode-scanner";
 
 export interface CameraPermissionState {
-  cameraStatus : string,
+  cameraStatus?: string,
   loading : boolean,
   errorCam: boolean
 }

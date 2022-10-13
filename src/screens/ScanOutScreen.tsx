@@ -9,7 +9,6 @@ import { getCameraPermission } from '../store/slices/cameraPermission'
 import Loader from '../components/Loader'
 import LaunchCam from '../components/LaunchCam'
 import ConsumeProduct from '../components/ConsumeProduct'
-import { Product } from '../models/Product'
 import { newQtyToNumber, showToast } from '../../utils'
 import { scan, unscan } from '../store/slices/scanning'
 import { getData, getType, resetCodeBarData } from '../store/slices/dataBarCode'
@@ -18,9 +17,8 @@ import ManualCodeBar from '../components/ManualCodeBar'
 
 type ScanOutScreenProps = {
   realm: Realm
-  allProducts: Product[]
 }
-const ScanOutScreen:FC<ScanOutScreenProps> = ({realm, allProducts}: ScanOutScreenProps) => {
+const ScanOutScreen:FC<ScanOutScreenProps> = ({realm}: ScanOutScreenProps) => {
 
   const [productExists, setProductExists] = useState<boolean>(false)
   const [productAsProp, setProductAsProp] = useState<any>(null)

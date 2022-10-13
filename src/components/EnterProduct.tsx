@@ -1,30 +1,73 @@
 import { StyleSheet, Text, View } from 'react-native'
-import React, { FC } from 'react'
-import { Product } from '../models/Product'
+import React, { FC, useState } from 'react'
 import { Button, TextInput } from 'react-native-paper'
-import { newQtyToNumber } from '../../utils'
+import { newQtyToNumber, showToast } from '../../utils'
 import globalStyles from '../../globalStyles'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from '../store/store'
+import { hideModal } from '../store/slices/modal'
+import { Product } from '../models/Product'
+import { updateProduct } from '../actions/productActions'
+import { unscan } from '../store/slices/scanning'
+import { resetCodeBarData } from '../store/slices/dataBarCode'
 
 type EnterProductProps = {
-  data: string
-  product: Product
-  validateNewStock : Function
-  newQty: string
-  setNewQty: Function
-  cancelNewStock: Function
+  realm: Realm
 }
 
-const EnterProduct: FC<EnterProductProps> = ({data, product, validateNewStock, newQty, setNewQty, cancelNewStock}: EnterProductProps) => {
+const EnterProduct: FC<EnterProductProps> = ({realm}: EnterProductProps) => {
+
+  const {singleProduct, allProducts} = useSelector((state: RootState)=> state.productAndCategories)
+
+  const [newQty, setNewQty] = useState<string>("1")
+
+  const dispatch = useDispatch()
+
+  const validateNewStock = ()=>{
+    dispatch(hideModal())
+
+    const product: Product[] = allProducts.filter((prod: Product)=> prod._id === singleProduct._id)
+
+    const updatedProd: Product = {...product[0], qty: product[0].qty += +newQty}
+
+    updateProduct(realm, updatedProd)
+
+    setTimeout(()=>{
+      dispatch(unscan())
+    }, 1500)
+    
+    dispatch(resetCodeBarData())
+
+    setNewQty("1")
+
+    const productUpdated:any = realm.objectForPrimaryKey("Product", singleProduct._id)
+    showToast("success", "Stock mis à jour", `Stock actuel de ${singleProduct.nom} : ${productUpdated.qty} unités.`)
+
+  }
+
+  const cancelNewStock = ()=>{
+    dispatch(hideModal())
+
+    setTimeout(()=>{
+      dispatch(unscan())
+    }, 3000)
+
+    dispatch(resetCodeBarData())
+
+    setNewQty("1")
+    
+    showToast("info", "Stock inchangé", "Mise à jour du stock annulée.")
+  }
 
   return (
     <View>
       <Text style={[globalStyles.screenTitle, {color:"green"}]}>Ajouter dans l'inventaire</Text>
-      <Text style={{textAlign:"center", marginVertical:20}}>Code-barre n° {data}</Text>
+      <Text style={{textAlign:"center", marginVertical:20}}>Code-barre n° {singleProduct._id}</Text>
       <View style={{flexDirection:"row", width:"100%", justifyContent:"space-between", marginBottom:20}}>
         <View style={{width:"50%", paddingLeft:10}}>
-          <Text style={[globalStyles.nom, {alignSelf:'flex-start'}]}>{product.nom}</Text>
-          <Text style={globalStyles.marque}>{product.marque}</Text>
-          <Text style={[globalStyles.categorie, {alignSelf:'flex-start'}]}>{product.categorie.nom}</Text>
+          <Text style={[globalStyles.nom, {alignSelf:'flex-start'}]}>{singleProduct.nom}</Text>
+          <Text style={globalStyles.marque}>{singleProduct.marque}</Text>
+          <Text style={[globalStyles.categorie, {alignSelf:'flex-start'}]}>{singleProduct.categorie.nom}</Text>
         </View>
 
         <View style={{width:"50%", flexDirection:"row", alignItems:"center"}}>
@@ -34,7 +77,7 @@ const EnterProduct: FC<EnterProductProps> = ({data, product, validateNewStock, n
             <Text style={{fontFamily:"Rubik_600SemiBold", color:"purple"}}>Stock total : </Text>
           </View>
           <View>
-            <Text style={{marginTop:5, height: 40, alignSelf: "center"}}>{product.qty}</Text>
+            <Text style={{marginTop:5, height: 40, alignSelf: "center"}}>{singleProduct.qty}</Text>
             <TextInput
               mode='flat'
               label=""
@@ -48,7 +91,7 @@ const EnterProduct: FC<EnterProductProps> = ({data, product, validateNewStock, n
               dense={true}
               style={{marginTop:0}}
             />
-            <Text style={{marginBottom:10, marginTop: 25, fontFamily:"Rubik_600SemiBold", color: "purple"}}>{product.qty + newQtyToNumber(newQty)}</Text>
+            <Text style={{marginBottom:10, marginTop: 25, fontFamily:"Rubik_600SemiBold", color: "purple"}}>{singleProduct.qty + newQtyToNumber(newQty)}</Text>
           </View>
         </View>
       </View>
