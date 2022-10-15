@@ -19,7 +19,7 @@ const ResultWithText: FC<ResultWithTextProps> = ({listProduct}: ResultWithTextPr
   const dispatch = useDispatch()
 
   const onPressToChooseItem = (item: any)=>{
-    if(parType === "" || selectedMarqueOrCategory === item.item.toString()){
+    if(selectedMarqueOrCategory === item.item.toString()){
       dispatch(selectMarqueOrCategory(null))
       dispatch(changeFilters({...filters, dateEntree: false, recent: null}))    
 

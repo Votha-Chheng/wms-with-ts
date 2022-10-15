@@ -57,13 +57,13 @@ const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm}: ListeProduit
   const onPressItem = (id: string)=>{
     const prod = fetchProductById(realm, id)
     
-    if(prod !== null){
-      dispatch(getSingleProduct(prod))
-      dispatch(getSingleCategory(prod.categorie))
-      setModify(false)
-      dispatch(showModal())  
+    dispatch(getSingleProduct(prod))
+    dispatch(getSingleCategory(prod.categorie))
+    setLocalSingleProduct(prod)
+    setModify(false)
+    dispatch(showModal())  
       
-    }
+    console.log(localSingleProduct)
   }
 
   return (
@@ -77,19 +77,20 @@ const ListeProduitsScreen: FC<ListeProduitsScreenProps> = ({realm}: ListeProduit
           keyExtractor={(item: Product) => item._id.toString()}
           renderItem = {({item}) => (
             <InventaireListRender
-            data={item}
-            onPressFunction={()=>onPressItem(item._id.toString())}
+              data={item}
+              onPressFunction={()=>onPressItem(item._id.toString())}
             />
-            )}
+          )}
           ListEmptyComponent={<Text>Aucun produit trouvé</Text>}
         />
       </View>
       {
-        singleProduct !== null &&
+        localSingleProduct !== null &&
         <ModalListRenderer 
           modify={modify} 
           setModify={setModify} 
           realm={realm}
+          setLocalSingleProduct={setLocalSingleProduct}
           localSingleProduct={localSingleProduct}
         />
       }

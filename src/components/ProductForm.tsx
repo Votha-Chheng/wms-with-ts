@@ -9,7 +9,7 @@ import CategoryPicker from './CategoryPicker'
 import { Category } from '../models/Category'
 import { getSingleCategory, getSingleProduct } from '../store/slices/productsAndCategories'
 import { createNewCategory, fetchCategoryById } from '../actions/categoryActions'
-import { showToast } from '../../utils'
+import { onChangeSpaceTel, showToast, spaceTelFournisseur } from '../../utils'
 import globalStyles from '../../globalStyles'
 import { hideModal } from '../store/slices/modal'
 import { resetCodeBarData } from '../store/slices/dataBarCode'
@@ -32,6 +32,7 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
   const [qtyInput, setQtyInput] = useState<string>("")
   const [stockLimite, setStockLimite] = useState<string>("")
   const [telFournisseur, setTelFournisseur] = useState<string>("")
+  const [displayedTel, setDisplayedTel] = useState<string>("")
   const [webSite, setWebSite] = useState<string>("")
   const [commandeEncours, setCommandeEnCours] = useState<boolean>(false)
 
@@ -107,12 +108,11 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
     createNewProduct === true ? createProduct(realm, obj) : updateProduct(realm, obj)
     dispatch(hideModal())
     setCreateCatMode(false)
-    dispatch(getSingleProduct(null))
-
+    
     setTimeout(()=>{
       dispatch(unscan())
     }, 3000)
-
+    
     dispatch(resetCodeBarData())
   }
 
@@ -121,7 +121,7 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
       <Text style={styles.title}>{newProduct ? "Nouveau produit": "Modifier les infos produit"}</Text>
       <View style={{marginVertical:10, alignItems:"center"}}>
         <Text>Code-barre de type 
-          <Text style={styles.type}> {newProduct || type !== null ? type : newProduct === false ? singleProduct.codeBarType : "inconnu"}</Text> 
+          <Text style={styles.type}> {newProduct || type !== null ? type : newProduct === false ? singleProduct?.codeBarType : "inconnu"}</Text> 
           <Text> & n° </Text>
           <Text style={styles.type}>{newProduct || type !== null ? data : singleProduct._id}</Text>
         </Text>
@@ -189,14 +189,28 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
           <TextInput
             mode='outlined'
             label="N° de téléphone"
-            value={telFournisseur}
+            value={onChangeSpaceTel(telFournisseur)}
+            //onBlur={()=>setDisplayedTel(telFournisseur)}
             activeOutlineColor="#a25553"
             outlineColor='#c4cfd4'
-            onChangeText={text => setTelFournisseur(text)}
+            onChangeText={text =>{
+              setTelFournisseur(text)
+              //setDisplayedTel(spaceTelFournisseur(text))
+            }}
             autoComplete="off"
             keyboardType="numeric"
             style={globalStyles.input}
             maxLength={14}
+            right={
+              <TextInput.Icon 
+                icon="close-circle" 
+                color='red' 
+                onPress={()=> {
+                  setTelFournisseur("")
+                  setDisplayedTel("")
+                }}
+              />
+            }
           />
           <TextInput
             mode='outlined'
@@ -209,6 +223,7 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
             outlineColor='#54b3f2'
             style={globalStyles.input}
             left={<TextInput.Affix text="https://" />}
+            right={<TextInput.Icon icon="close-circle" color='red' onPress={()=> setWebSite("")}/>}
             autoCapitalize="none"
           />
         </View> 

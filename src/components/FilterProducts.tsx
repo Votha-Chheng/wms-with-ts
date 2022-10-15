@@ -86,7 +86,7 @@ const FilterProducts: FC<FilterProductsProps> = ({allProducts, allCategories}: F
           style={styles.chipStyle} 
           selected={alertStock === true} 
           icon="alert-outline" 
-          onPress={() => dispatch(changeFilters({...filters, alertStock: !alertStock, parType: ""}))}
+          onPress={() => dispatch(changeFilters({...filters, alertStock: !alertStock, parType: "", recent: true}))}
         >
           Critique
         </Chip>
@@ -114,10 +114,15 @@ const FilterProducts: FC<FilterProductsProps> = ({allProducts, allCategories}: F
           style={styles.chipStyle} 
           selected={
             (dateEntree === true && recent === true && parType === ""  && selectedMarqueOrCategory === null) || 
-            (dateEntree === true && recent === true && parType === "" && alertStock === true && selectedMarqueOrCategory === null)
+            (dateEntree === true && recent === true && parType === "" && alertStock === true && selectedMarqueOrCategory === null) ||
+            (dateEntree === true && recent === true && parType !== "" && selectedMarqueOrCategory !== null)
+
           } 
           icon="sort-calendar-ascending"
-          disabled={(parType !== "") && (selectedMarqueOrCategory !== null)}
+          disabled={
+            ((parType === "marque") && (selectedMarqueOrCategory === null)) ||
+            ((parType === "categorie") && (selectedMarqueOrCategory === null))
+          }
           onPress={() => dispatch(changeFilters({...filters, recent:true, dateEntree: true, alphabetique:false, ordreAlphabet:null}))}
         >
           Récents
@@ -125,10 +130,16 @@ const FilterProducts: FC<FilterProductsProps> = ({allProducts, allCategories}: F
         <Chip 
           style={styles.chipStyle} 
           selected={
-            (dateEntree === true &&  recent === false && parType !== "marque" && parType !== "categorie" && selectedMarqueOrCategory === null)
+            (dateEntree === true && recent === false && parType === ""  && selectedMarqueOrCategory === null) || 
+            (dateEntree === true && recent === false && parType === "" && alertStock === true && selectedMarqueOrCategory === null) ||
+            (dateEntree === true && recent === false && parType !== "" && selectedMarqueOrCategory !== null)
           } 
           icon="sort-calendar-descending" 
-          disabled={(parType !== "") && (selectedMarqueOrCategory !== null)}
+          disabled={
+            ((parType === "marque") && (selectedMarqueOrCategory === null)) ||
+            ((parType === "categorie") && (selectedMarqueOrCategory === null))
+            
+          }
           onPress={() => dispatch(changeFilters({...filters, recent:false, dateEntree: true, alphabetique:false, ordreAlphabet:null}))}
         >
           Anciens

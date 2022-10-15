@@ -2,15 +2,22 @@ import { Alert } from "react-native"
 import Toast from 'react-native-toast-message';
 import { Product } from "./src/models/Product";
 
-export const createButtonAlert = (titre: string, messageAlert:string, onPressFunction:any) : void => {
+export const createButtonAlert = (titre: string, messageAlert:string, onPressFunction:any, args:any[]) : void => {
+
+  function callbackStarter () {
+    const arg = [...arguments].concat(args)
+    onPressFunction(...arg)
+    console.log(arg)
+  }
+
   Alert.alert(
     titre,
     messageAlert,
     [
       { 
-        text: "OK", 
+        text: "Je confirme", 
         onPress: () => {
-          onPressFunction()
+          callbackStarter()
         },
         style: "default"
       },
@@ -51,8 +58,8 @@ export const setInitialToUpperCase = (text: string): string =>{
 }
 
 
-export const resetStringInput = (setterFunction: Function)=>{
-  setterFunction("")
+export const resetStringInput = (setFunction: Function)=>{
+  setFunction("")
 }
 
 
@@ -77,6 +84,13 @@ export const spaceTelFournisseur = (tel: string): string => {
 }
 
 
+export const onChangeSpaceTel = (tel: string): string=>{
+  let arrTel: string[] = tel.split("").filter(item => item !== " ")
+  return spaceTelFournisseur(arrTel.join(""))
+
+}
+
+
 export const renderColorText = (product: Product, forText: boolean, colorAlert: string, colorNormal: string, colorCommande: string = "orange") : string =>{
   if(forText === true){
     return product.qty <= product.stockLimite ? colorAlert : colorNormal
@@ -85,7 +99,6 @@ export const renderColorText = (product: Product, forText: boolean, colorAlert: 
     return (product.qty <= product.stockLimite) && product.commandeEncours === true ? colorCommande : product.qty <= product.stockLimite ? colorAlert : colorNormal
 
   }
-  
 }
 
 
@@ -99,17 +112,27 @@ export const sortHandle = (filters: any, a: any, b: any, typeSecond: string = ""
 
 }
 
+
+export const replaceCollection = (elementToScan: any)=>{
+  return (
+    elementToScan
+      .toLowerCase()
+      .replace(/[û, ü, ù]/g, "u")
+      .replace(/[é, è, ë, ê]/g, "e")
+      .replace(/[â, ä, à]/g, "a")
+      .replace(/[ô, ö, à]/g, "o")
+      .replace(/[ï, î]/g, "i")
+  )
+    
+}
+
 export const matchingIncludes = (element: Product, keyName:string, textToScan:string)=>{
-
-  const replaceCollection = (elementToScan: any)=>{
-    return elementToScan.toLowerCase().replace(/[û, ü]/g, "u").replace(/[é, è, ë, ê]/g, "e").replace(/[â, ä, à]/, "a")
-  }
-
   const newResearch = replaceCollection(element[keyName])
   const newTextToScan = replaceCollection(textToScan)
 
   return newResearch.includes(newTextToScan)
 }
+
 
 const handleSearchChange = (text: string, productList: Product[]): Product[]=>{
 

@@ -15,9 +15,10 @@ type ModalListRendererProps = {
   modify: boolean
   setModify: Function
   localSingleProduct: Product
+  setLocalSingleProduct: Function
 }
 
-const ModalListRenderer: FC<ModalListRendererProps> = ({realm, modify, setModify, localSingleProduct}: ModalListRendererProps) => {
+const ModalListRenderer: FC<ModalListRendererProps> = ({realm, modify, setModify, localSingleProduct, setLocalSingleProduct}: ModalListRendererProps) => {
 
   const {singleProduct} = useSelector((state: RootState)=> state.productAndCategories)
 
@@ -64,6 +65,7 @@ const ModalListRenderer: FC<ModalListRendererProps> = ({realm, modify, setModify
               realm={realm} 
               setModify={setModify}
               localSingleProduct = {localSingleProduct}
+              setLocalSingleProduct={setLocalSingleProduct}
             />
             :
             null

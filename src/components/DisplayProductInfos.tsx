@@ -12,15 +12,17 @@ type DisplayProductInfosProps = {
   setModify: Function
   realm: Realm
   localSingleProduct: Product
+  setLocalSingleProduct: Function
 }
 
-const DisplayProductInfos: FC<DisplayProductInfosProps> = ({setModify, realm, localSingleProduct}: DisplayProductInfosProps) => {
+const DisplayProductInfos: FC<DisplayProductInfosProps> = ({setModify, realm, localSingleProduct, setLocalSingleProduct}: DisplayProductInfosProps) => {
 
   const dispatch = useDispatch()
 
   const goBackButton = ()=>{
     dispatch(hideModal())
     dispatch(getSingleProduct(null))
+    setLocalSingleProduct(null)
   }
 
   const changeCommandeEnCours = (id: any)=>{

@@ -22,15 +22,8 @@ export type OptionStackParams = {
 
 const OptionScreen: FC<OptionScreenProps> = ({realm}: OptionScreenProps) => {
 
-
   const dispatch = useDispatch()
 
-  // useEffect(()=>{
-  //   if(chosenOption === ""){
-  //     dispatch(hideModal())
-  //   }
-
-  // }, [chosenOption])
 
   useEffect(()=>{
     dispatch(unscan())

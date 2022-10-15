@@ -45,39 +45,48 @@ const NavigationScreen:FC = () => {
   useEffect(()=>{
     let productsList: any, categoryList: any
 
-    Realm.open({
-      path:"myrealm",
-      schema: [ProductSchema, CategorySchema],
-      deleteRealmIfMigrationNeeded: true,
-    })
-    .then(realm => {
-      setRealm(realm)
-      const products = fetchAllProducts(realm)
-      const categories = fetchAllCategories(realm)
-      dispatch(getAllProducts(products))
-      dispatch(getAllCategories(categories))
-      setBadge(fetchProductsAlert(realm))
-
-      productsList = realm.objects("Product")
-      categoryList = realm.objects("Category")
-
-      try {    
-        productsList.addListener(()=>{
+    const openRealm = async()=>{
+      try {
+        Realm.open({
+          path:"myrealm",
+          schema: [ProductSchema, CategorySchema],
+          deleteRealmIfMigrationNeeded: true,
+        })
+        .then(realm => {
+          setRealm(realm)
           const products = fetchAllProducts(realm)
-          dispatch(getAllProducts(products))
-          setBadge(fetchProductsAlert(realm))
-        })
-        categoryList.addListener(()=>{
           const categories = fetchAllCategories(realm)
+          dispatch(getAllProducts(products))
           dispatch(getAllCategories(categories))
+          setBadge(fetchProductsAlert(realm))
+    
+          productsList = realm.objects("Product")
+          categoryList = realm.objects("Category")
+    
+          try {    
+            productsList.addListener(()=>{
+              const products = fetchAllProducts(realm)
+              dispatch(getAllProducts(products))
+              setBadge(fetchProductsAlert(realm))
+            })
+            categoryList.addListener(()=>{
+              const categories = fetchAllCategories(realm)
+              dispatch(getAllCategories(categories))
+            })
+            
+          } catch (err) {
+            showToast("error", "Erreur : Mise à jour de l'inventaire", "L'inventaire n'a pas été mis à jour. Recommencez.")
+            console.log(err.message)
+            return err.message
+          }
         })
-        
-      } catch (err) {
-        showToast("error", "Erreur : Mise à jour de l'inventaire", "L'inventaire n'a pas été mis à jour. Recommencez.")
-        console.log(err.message)
-        return err.message
+      } catch (error) {
+        console.log(error)
+        showToast("error", "Impossible de charger l'inventaire !", "Veuillez redémarrer l'application")
       }
-    })
+    }
+
+    openRealm()
 
     return()=>{
       productsList.removeAllListeners()

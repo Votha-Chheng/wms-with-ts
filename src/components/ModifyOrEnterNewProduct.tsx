@@ -14,7 +14,7 @@ const ModifyOrEnterNewProduct:FC<NewProductProps> = ({realm, newProduct}: NewPro
 
   return (
     <ScrollView>
-      <ProductForm newProduct={true} realm={realm}/>
+      <ProductForm newProduct={newProduct} realm={realm}/>
     </ScrollView>
   )
 }

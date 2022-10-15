@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../store/store'
 import { Product } from '../models/Product'
 import { createButtonAlert, displayProductByFilters, showToast } from '../../utils'
-import { fetchProductById } from '../actions/productActions'
+import { deleteProduct, fetchProductById } from '../actions/productActions'
 import { getSingleProduct } from '../store/slices/productsAndCategories'
 import ItemProductToDelete from '../components/ItemProductToDelete'
 import { Button } from 'react-native-paper'
@@ -37,14 +37,6 @@ const DeleteProductScreen: FC<DeleteProductScreenProps> = ({realm}: DeleteProduc
     showToast("success", 'Inventaire vide !', "Il n'y a plus rien dans l'inventaire.")
   }
 
-  const onPressItem = (id: string)=>{
-    const prod = fetchProductById(realm, id)
-    
-    if(prod !== null){
-      dispatch(getSingleProduct(prod))
- 
-    }
-  }
 
   return (
     <View>
@@ -58,7 +50,7 @@ const DeleteProductScreen: FC<DeleteProductScreenProps> = ({realm}: DeleteProduc
             color="red" 
             mode='contained' 
             style={{marginBottom:15, width:'90%', alignSelf:"center"}} 
-            onPress={()=>createButtonAlert("Attention !", "Vous êtes sur le point de supprimer tous les produit de l'inventaire !", deleteAllObjects)}>
+            onPress={()=>createButtonAlert("Attention !", "Vous êtes sur le point de supprimer tous les produit de l'inventaire !", deleteAllObjects, null)}>
             Supprimer tous les produits
           </Button>
         }
@@ -67,7 +59,7 @@ const DeleteProductScreen: FC<DeleteProductScreenProps> = ({realm}: DeleteProduc
         renderItem = {({item}) => (
           <ItemProductToDelete
             data={item}
-            onPressFunction={()=>onPressItem(item._id.toString())}
+            onPressFunction={()=>createButtonAlert(`Vous êtes sur le point de supprimer le produit : ${item.nom}`, "Confirmer pour supprimer définitivement le produit.", deleteProduct, [realm, item._id])}
           />
         )}
         ListEmptyComponent={<Text style={{textAlign:"center", marginBottom:20}} >Aucun produit trouvé</Text>
