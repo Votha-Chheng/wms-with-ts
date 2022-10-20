@@ -89,6 +89,17 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
   }
 
   const createOrModifyProduct = (createNewProduct: boolean)=>{
+    if(
+      marqueInput === "" || !marqueInput || 
+      nomInput === "" || !nomInput || 
+      qtyInput === "" || !qtyInput || 
+      stockLimite === "" || !stockLimite ||
+      categoryInput === "" || !categoryInput
+    ) {
+      showToast("error", "Informations obligatoires manquantes", "Le nom, le fabricant, la catégorie, et les quantités sont obligatoires.")
+      return
+    }
+
     const catId = allCategories.filter((cat: Category)=> cat.nom === selectedCategoryName.trim())
     const cat: Category = fetchCategoryById(realm, catId[0]._id)
 
@@ -185,17 +196,15 @@ const ProductForm: FC<ProductFormProps> = ({newProduct, realm}: ProductFormProps
         />
         
         <View style={{borderColor: "#c4cfd4", borderWidth:2, padding:2.5, marginBottom:10}}>
-          <Text style={{color:"#6e6e72", fontSize:15, marginVertical:5, marginLeft:10}}>Contact fournisseur (optionnel)</Text>
+          <Text style={{color:"#6e6e72", fontSize:15, marginVertical:5, marginLeft:10}}>Contact fournisseur (optionnels)</Text>
           <TextInput
             mode='outlined'
             label="N° de téléphone"
             value={onChangeSpaceTel(telFournisseur)}
-            //onBlur={()=>setDisplayedTel(telFournisseur)}
             activeOutlineColor="#a25553"
             outlineColor='#c4cfd4'
             onChangeText={text =>{
               setTelFournisseur(text)
-              //setDisplayedTel(spaceTelFournisseur(text))
             }}
             autoComplete="off"
             keyboardType="numeric"

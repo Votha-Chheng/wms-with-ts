@@ -122,8 +122,7 @@ export const replaceCollection = (elementToScan: any)=>{
       .replace(/[â, ä, à]/g, "a")
       .replace(/[ô, ö, à]/g, "o")
       .replace(/[ï, î]/g, "i")
-  )
-    
+  )  
 }
 
 export const matchingIncludes = (element: Product, keyName:string, textToScan:string)=>{
